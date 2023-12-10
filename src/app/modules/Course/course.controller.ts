@@ -24,7 +24,7 @@ const createCourse: RequestHandler = async (req, res) => {
 
 const getAllCourse: RequestHandler = async (req, res) => {
   try {
-    const result = await CourseServices.getAllCourseIntoDB();
+    const result = await CourseServices.getAllCourseFromDB();
     res.status(200).json({
       success: true,
       message: "Course retrieved successfully",

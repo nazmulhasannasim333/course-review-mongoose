@@ -29,4 +29,19 @@ const courseSchema = new Schema<TCourse>({
   },
 });
 
+// calculate duration
+courseSchema.pre("save", function (next) {
+  if (!this.durationInWeeks) {
+    const startDate = new Date(this.startDate);
+    const endDate = new Date(this.endDate);
+
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const daysDifference = timeDifference / (1000 * 3600 * 24);
+
+    this.durationInWeeks = Math.ceil(daysDifference / 7);
+  }
+
+  next();
+});
+
 export const Course = mongoose.model<TCourse>("Course", courseSchema);

@@ -6,12 +6,12 @@ const createCourseIntoDB = async (payload: TCourse) => {
   return result;
 };
 
-const getAllCourseIntoDB = async () => {
+const getAllCourseFromDB = async () => {
   const result = await Course.find();
   return result;
 };
 
 export const CourseServices = {
   createCourseIntoDB,
-  getAllCourseIntoDB,
+  getAllCourseFromDB,
 };

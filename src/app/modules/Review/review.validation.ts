@@ -6,6 +6,6 @@ const createReviewValidationSchema = z.object({
   review: z.string(),
 });
 
-export const CategoryValidations = {
+export const ReviewValidations = {
   createReviewValidationSchema,
 };
