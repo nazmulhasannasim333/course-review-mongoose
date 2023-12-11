@@ -1,49 +1,53 @@
-import { RequestHandler } from "express";
 import { CourseServices } from "./course.service";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import httpStatus from "http-status";
 
-const createCourse: RequestHandler = async (req, res) => {
-  try {
-    const result = await CourseServices.createCourseIntoDB(req.body);
-    res.status(200).json({
-      success: true,
-      message: "Course created successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Course not found",
-      error: {
-        code: 404,
-        description: "Course not found!",
-        error: error,
-      },
-    });
-  }
-};
+const createCourse = catchAsync(async (req, res) => {
+  const result = await CourseServices.createCourseIntoDB(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "Course created successfully",
+    data: result,
+  });
+});
 
-const getAllCourse: RequestHandler = async (req, res) => {
-  try {
-    const result = await CourseServices.getAllCourseFromDB();
-    res.status(200).json({
-      success: true,
-      message: "Course retrieved successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Course not found",
-      error: {
-        code: 404,
-        description: "Course not found!",
-        error: error,
-      },
-    });
-  }
-};
+const getAllCourse = catchAsync(async (req, res) => {
+  const result = await CourseServices.getAllCourseFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Course retrieved successfully",
+    data: result,
+  });
+});
+
+const getCourseByIdWithReview = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CourseServices.getCourseByIdWithReviewFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Course and Reviews retrieved successfully",
+    data: { course: result.getCourse, reviews: result.getReview },
+  });
+});
+
+const updateCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CourseServices.updateCourseIntoDB(id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Course updated successfully",
+    data: result,
+  });
+});
 
 export const CourseController = {
   createCourse,
   getAllCourse,
+  getCourseByIdWithReview,
+  updateCourse,
 };
