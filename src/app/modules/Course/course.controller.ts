@@ -14,7 +14,7 @@ const createCourse = catchAsync(async (req, res) => {
 });
 
 const getAllCourse = catchAsync(async (req, res) => {
-  const result = await CourseServices.getAllCourseFromDB();
+  const result = await CourseServices.getAllCourseFromDB(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -34,6 +34,22 @@ const getCourseByIdWithReview = catchAsync(async (req, res) => {
   });
 });
 
+const getBestCourse = catchAsync(async (req, res) => {
+  const result = await CourseServices.getBestCourseFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Course and Reviews retrieved successfully",
+    data: {
+      course: {
+        ...result.bestCourse,
+        averageRating: result.formattedAverageRating,
+        reviewCount: result.reviewCount,
+      },
+    },
+  });
+});
+
 const updateCourse = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await CourseServices.updateCourseIntoDB(id, req.body);
@@ -50,4 +66,5 @@ export const CourseController = {
   getAllCourse,
   getCourseByIdWithReview,
   updateCourse,
+  getBestCourse,
 };

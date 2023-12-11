@@ -12,6 +12,7 @@ router.post(
 );
 router.get("/courses", CourseController.getAllCourse);
 router.get("/courses/:id/reviews", CourseController.getCourseByIdWithReview);
+router.get("/course/best", CourseController.getBestCourse);
 router.put("/courses/:id", CourseController.updateCourse);
 
 export const CourseRoutes = router;
