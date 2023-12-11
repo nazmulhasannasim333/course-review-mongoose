@@ -4,6 +4,8 @@ import { Review } from "../Review/review.model";
 import { TCourse } from "./course.interface";
 import { Course } from "./course.model";
 import mongoose from "mongoose";
+import { CourseQuery } from "../../interface/queryTypes";
+import { filter } from "../../queryHelper/filterQuery";
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
@@ -25,73 +27,53 @@ const createCourseIntoDB = async (payload: TCourse) => {
 //   return result;
 // };
 
-interface CourseQuery {
-  page?: number;
-  limit?: number;
-  sortBy?:
-    | "title"
-    | "price"
-    | "startDate"
-    | "endDate"
-    | "language"
-    | "durationInWeeks";
-  sortOrder?: "asc" | "desc";
-  minPrice?: number;
-  maxPrice?: number;
-  tags?: string;
-  startDate?: Date;
-  endDate?: Date;
-  language?: string;
-  provider?: string;
-  durationInWeeks?: number;
-  level?: string;
-}
-
 const getAllCourseFromDB = async (query: CourseQuery) => {
-  const {
-    page = 1,
-    limit = 10,
-    sortBy = "startDate",
-    sortOrder = "asc",
-    minPrice,
-    maxPrice,
-    tags,
-    startDate,
-    endDate,
-    language,
-    provider,
-    durationInWeeks,
-    level,
-  } = query;
-
-  const filters: Record<string, any> = {};
-
-  // Apply filters
-  if (minPrice !== undefined || maxPrice !== undefined) {
-    filters.price = {};
-    if (minPrice !== undefined) filters.price.$gte = minPrice;
-    if (maxPrice !== undefined) filters.price.$lte = maxPrice;
-  }
-
-  if (tags) filters["tags.name"] = tags;
-
-  if (startDate) filters.startDate = { $gte: startDate };
-  if (endDate) filters.endDate = { $lte: endDate };
-
-  if (language) filters.language = language;
-  if (provider) filters.provider = provider;
-
-  if (durationInWeeks !== undefined) filters.durationInWeeks = durationInWeeks;
-
-  if (level) filters["details.level"] = level;
-
-  // Construct the Mongoose query
-  const result = await Course.find(filters)
-    .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
-    .skip((page - 1) * limit)
-    .limit(limit);
-
+  const result = await filter(Course.find(), query);
   return result;
+  // const {
+  //   page = 1,
+  //   limit = 10,
+  //   sortBy = "startDate",
+  //   sortOrder = "asc",
+  //   minPrice,
+  //   maxPrice,
+  //   tags,
+  //   startDate,
+  //   endDate,
+  //   language,
+  //   provider,
+  //   durationInWeeks,
+  //   level,
+  // } = query;
+
+  // const filters: Record<string, any> = {};
+
+  // // Apply filters
+  // if (minPrice !== undefined || maxPrice !== undefined) {
+  //   filters.price = {};
+  //   if (minPrice !== undefined) filters.price.$gte = minPrice;
+  //   if (maxPrice !== undefined) filters.price.$lte = maxPrice;
+  // }
+
+  // if (tags) filters["tags.name"] = tags;
+
+  // if (startDate) filters.startDate = { $gte: startDate };
+  // if (endDate) filters.endDate = { $lte: endDate };
+
+  // if (language) filters.language = language;
+  // if (provider) filters.provider = provider;
+
+  // if (durationInWeeks !== undefined) filters.durationInWeeks = durationInWeeks;
+
+  // if (level) filters["details.level"] = level;
+
+  // // Construct the Mongoose query
+  // const result = await Course.find(filters)
+  //   .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
+  //   .skip((page - 1) * limit)
+  //   .limit(limit);
+
+  // return result;
 };
 
 const getCourseByIdWithReviewFromDB = async (id: string) => {

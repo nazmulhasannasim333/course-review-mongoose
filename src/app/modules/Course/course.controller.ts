@@ -39,7 +39,7 @@ const getBestCourse = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Course and Reviews retrieved successfully",
+    message: "Best course retrieved successfully",
     data: {
       course: {
         ...result.bestCourse,
