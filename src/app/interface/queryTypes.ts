@@ -1,5 +1,4 @@
 export interface CourseQuery {
-  [key: string]: unknown;
   page?: number;
   limit?: number;
   sortBy?: string;
