@@ -8,6 +8,7 @@ import { CourseQuery } from "../../interface/queryTypes";
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
+
   return result;
 };
 
@@ -30,7 +31,7 @@ const getAllCourseFromDB = async (query: CourseQuery) => {
 
   const filters: Record<string, any> = {};
 
-  // Apply filters
+  //filters
   if (minPrice !== undefined || maxPrice !== undefined) {
     filters.price = {};
     if (minPrice !== undefined) filters.price.$gte = minPrice;
