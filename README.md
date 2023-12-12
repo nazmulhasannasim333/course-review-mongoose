@@ -58,7 +58,7 @@ Start the server
   http://localhost:5000/api/courses/courseId/reviews
 ```
 
--Get Best Review
+-Get Best Course
 
 ```http
   http://localhost:5000/api/course/best
