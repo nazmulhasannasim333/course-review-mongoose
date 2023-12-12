@@ -1,5 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import { TCourse } from "./course.interface";
+import AppError from "../../errors/AppError";
+import httpStatus from "http-status";
 
 const courseSchema = new Schema<TCourse>({
   title: { type: String, unique: true, required: [true, "Title is required"] },
@@ -27,6 +29,19 @@ const courseSchema = new Schema<TCourse>({
     level: { type: String, required: [true, "Level is required"] },
     description: { type: String, required: [true, "Description is required"] },
   },
+});
+
+courseSchema.pre("save", async function (next) {
+  const isCourseExist = await Course.findOne({
+    title: this.title,
+  });
+  if (isCourseExist) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "This course title already exists!"
+    );
+  }
+  next();
 });
 
 // calculate duration
