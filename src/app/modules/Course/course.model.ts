@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import mongoose, { Schema } from "mongoose";
 import { TCourse } from "./course.interface";
 import AppError from "../../errors/AppError";

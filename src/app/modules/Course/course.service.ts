@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { Review } from "../Review/review.model";
@@ -31,7 +33,7 @@ const getAllCourseFromDB = async (query: CourseQuery) => {
 
   const filters: Record<string, any> = {};
 
-  //filters
+  // Apply filters
   if (minPrice !== undefined || maxPrice !== undefined) {
     filters.price = {};
     if (minPrice !== undefined) filters.price.$gte = minPrice;
@@ -50,12 +52,23 @@ const getAllCourseFromDB = async (query: CourseQuery) => {
 
   if (level) filters["details.level"] = level;
 
+  // Get total count of documents that match the filters
+  const totalCount = await Course.countDocuments(filters);
+
+  // Retrieve paginated data
   const result = await Course.find(filters)
     .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
-  return result;
+  return {
+    data: result,
+    meta: {
+      page,
+      limit,
+      total: totalCount,
+    },
+  };
 };
 
 const getCourseByIdWithReviewFromDB = async (id: string) => {
@@ -102,7 +115,22 @@ const getBestCourseFromDB = async () => {
 };
 
 const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
-  const { tags, details, ...remainingField } = payload;
+  const {
+    tags,
+    details,
+    startDate,
+    endDate,
+    durationInWeeks,
+    ...remainingField
+  } = payload;
+
+  // Check if user want to update durationInWeeks directly
+  if (durationInWeeks !== undefined) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Cannot update durationInWeeks directly"
+    );
+  }
 
   const session = await mongoose.startSession();
 
@@ -122,6 +150,21 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
 
     if (!modifiedUpdatedData) {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to update course");
+    }
+
+    // Calculate durationInWeeks based on startDate and endDate
+    if (startDate && endDate) {
+      const timeDifference =
+        new Date(endDate).getTime() - new Date(startDate).getTime();
+      modifiedUpdatedData["durationInWeeks"] = Math.ceil(
+        timeDifference / (1000 * 3600 * 24 * 7)
+      );
+      modifiedUpdatedData["startDate"] = new Date(startDate)
+        .toISOString()
+        .substr(0, 10);
+      modifiedUpdatedData["endDate"] = new Date(endDate)
+        .toISOString()
+        .substr(0, 10);
     }
 
     // check there have any pre tag fields
