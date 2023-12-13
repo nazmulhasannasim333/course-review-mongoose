@@ -152,19 +152,49 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
       throw new AppError(httpStatus.BAD_REQUEST, "Failed to update course");
     }
 
-    // Calculate durationInWeeks based on startDate and endDate
-    if (startDate && endDate) {
-      const timeDifference =
-        new Date(endDate).getTime() - new Date(startDate).getTime();
-      modifiedUpdatedData["durationInWeeks"] = Math.ceil(
-        timeDifference / (1000 * 3600 * 24 * 7)
-      );
-      modifiedUpdatedData["startDate"] = new Date(startDate)
-        .toISOString()
-        .substr(0, 10);
-      modifiedUpdatedData["endDate"] = new Date(endDate)
-        .toISOString()
-        .substr(0, 10);
+    if (startDate || endDate) {
+      const courseData = await Course.findById(id);
+
+      if (startDate && !endDate) {
+        // Update only startDate and recalculate durationInWeeks
+        const endDate: any = courseData?.endDate;
+        const timeDifference =
+          new Date(endDate).getTime() - new Date(startDate).getTime();
+        modifiedUpdatedData["durationInWeeks"] = Math.ceil(
+          timeDifference / (1000 * 3600 * 24 * 7)
+        );
+        modifiedUpdatedData["startDate"] = new Date(startDate)
+          .toISOString()
+          .substr(0, 10);
+      }
+
+      if (endDate && !startDate) {
+        // Update only endDate and recalculate durationInWeeks
+        const startDate: any = courseData?.startDate;
+        const timeDifference =
+          new Date(endDate).getTime() - new Date(startDate).getTime();
+        modifiedUpdatedData["durationInWeeks"] = Math.ceil(
+          timeDifference / (1000 * 3600 * 24 * 7)
+        );
+        modifiedUpdatedData["endDate"] = new Date(endDate)
+          .toISOString()
+          .substr(0, 10);
+      }
+
+      // Calculate durationInWeeks based on startDate and endDate
+      if (startDate && endDate) {
+        const timeDifference =
+          new Date(endDate).getTime() - new Date(startDate).getTime();
+        modifiedUpdatedData["durationInWeeks"] = Math.ceil(
+          timeDifference / (1000 * 3600 * 24 * 7)
+        );
+        modifiedUpdatedData["startDate"] = new Date(startDate)
+          .toISOString()
+          .substr(0, 10);
+        modifiedUpdatedData["endDate"] = new Date(endDate)
+          .toISOString()
+          .substr(0, 10);
+      }
     }
 
     // check there have any pre tag fields
