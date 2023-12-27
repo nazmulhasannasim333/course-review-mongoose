@@ -4,6 +4,7 @@ import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const createCourse = catchAsync(async (req, res) => {
+  req.body.createdBy = req.user._id;
   const result = await CourseServices.createCourseIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -19,7 +20,7 @@ const getAllCourse = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Course retrieved successfully",
-    data: { data: result.data, meta: result.meta },
+    data: { courses: result.data, meta: result.meta },
   });
 });
 
@@ -45,6 +46,7 @@ const getBestCourse = catchAsync(async (req, res) => {
         ...result.bestCourse,
         averageRating: result.formattedAverageRating,
         reviewCount: result.reviewCount,
+        createdBy: result.createdBy,
       },
     },
   });

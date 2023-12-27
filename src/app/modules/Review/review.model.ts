@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import mongoose, { Schema } from "mongoose";
 import { TReview } from "./review.interface";
 
@@ -13,6 +15,11 @@ const reviewSchema = new Schema<TReview>({
     max: [5, "Rating must not exceed 5"],
   },
   review: { type: String, required: [true, "Review is required"] },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    required: [true, "Creator id is required"],
+    ref: "user",
+  },
 });
 
 export const Review = mongoose.model<TReview>("Review", reviewSchema);

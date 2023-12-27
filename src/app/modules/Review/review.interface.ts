@@ -4,4 +4,5 @@ export interface TReview {
   courseId: Types.ObjectId;
   rating: number;
   review: string;
+  createdBy: Types.ObjectId;
 }

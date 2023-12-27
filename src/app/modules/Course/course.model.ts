@@ -30,6 +30,11 @@ const courseSchema = new Schema<TCourse>({
     level: { type: String, required: [true, "Level is required"] },
     description: { type: String, required: [true, "Description is required"] },
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    required: [true, "Creator id is required"],
+    ref: "user",
+  },
 });
 
 courseSchema.pre("save", async function (next) {

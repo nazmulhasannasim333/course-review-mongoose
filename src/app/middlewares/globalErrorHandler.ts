@@ -7,6 +7,8 @@ import handleCastError from "../errors/handleCastError";
 import handleDuplicateError from "../errors/handleDuplicateError";
 import handleValidationError from "../errors/handleValidationError";
 import AppError from "../errors/AppError";
+import httpStatus from "http-status";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -14,6 +16,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let message = err.message || "Something went wrong";
   let errorMessage = "Internal server error";
   let errorDetails = err;
+  let stack = config.NODE_ENV === "development" ? err?.stack : null;
 
   if (err instanceof ZodError) {
     const zodValidationError = handleZodError(err);
@@ -39,6 +42,23 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     message = validationError.message;
     errorMessage = validationError.errorMessage;
     errorDetails = validationError.errorDetails;
+  } else if (err.statusCode === httpStatus.UNAUTHORIZED) {
+    statusCode = httpStatus.UNAUTHORIZED;
+    message = err.message;
+    errorMessage =
+      "You do not have the necessary permissions to access this resource.";
+    errorDetails = null;
+    stack = null;
+  } else if (
+    err instanceof JsonWebTokenError &&
+    err.name === "JsonWebTokenError"
+  ) {
+    statusCode = httpStatus.UNAUTHORIZED;
+    message = "Unauthorized Access";
+    errorMessage =
+      "You do not have the necessary permissions to access this resource.";
+    errorDetails = null;
+    stack = null;
   } else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err?.message;
@@ -56,7 +76,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     message,
     errorMessage,
     errorDetails,
-    stack: config.NODE_ENV === "development" ? err?.stack : null,
+    stack,
   });
 };
 

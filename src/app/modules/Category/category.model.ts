@@ -5,6 +5,11 @@ import httpStatus from "http-status";
 
 const categorySchema = new Schema<TCategory>({
   name: { type: String, unique: true, required: [true, "Name is required"] },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    required: [true, "Creator id is required"],
+    ref: "user",
+  },
 });
 
 categorySchema.pre("save", async function (next) {

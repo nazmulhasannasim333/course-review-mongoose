@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 
 const createCategory = catchAsync(async (req, res) => {
+  req.body.createdBy = req.user._id;
   const result = await CategoryServices.createCategoryIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

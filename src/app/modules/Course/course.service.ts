@@ -57,6 +57,10 @@ const getAllCourseFromDB = async (query: CourseQuery) => {
 
   // Retrieve paginated data
   const result = await Course.find(filters)
+    .populate({
+      path: "createdBy",
+      select: "_id username email role",
+    })
     .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
     .skip((page - 1) * limit)
     .limit(limit);
@@ -72,11 +76,17 @@ const getAllCourseFromDB = async (query: CourseQuery) => {
 };
 
 const getCourseByIdWithReviewFromDB = async (id: string) => {
-  const getCourse = await Course.findById(id).lean();
+  const getCourse = await Course.findById(id).populate({
+    path: "createdBy",
+    select: "_id username email role",
+  });
   const getReview = await Review.find(
     { courseId: id },
     { _id: 0, __v: 0 }
-  ).lean();
+  ).populate({
+    path: "createdBy",
+    select: "_id username email role",
+  });
 
   return { getCourse, getReview };
 };
@@ -102,6 +112,17 @@ const getBestCourseFromDB = async () => {
     },
     { $limit: 1 },
     {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdByData",
+      },
+    },
+    {
+      $unwind: "$createdByData",
+    },
+    {
       $project: {
         reviews: 0,
       },
@@ -110,8 +131,18 @@ const getBestCourseFromDB = async () => {
   const bestCourse = bestCourseData[0];
   const formattedAverageRating = Number(bestCourse?.averageRating?.toFixed(1));
   const reviewCount = bestCourse.reviewCount;
+  let createdBy = bestCourse?.createdByData;
+  if (bestCourse) {
+    delete bestCourse.createdByData;
+    createdBy = {
+      _id: createdBy?._id,
+      username: createdBy?.username,
+      email: createdBy?.email,
+      role: createdBy?.role,
+    };
+  }
 
-  return { bestCourse, formattedAverageRating, reviewCount };
+  return { bestCourse, formattedAverageRating, reviewCount, createdBy };
 };
 
 const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
@@ -254,7 +285,10 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
         new: true,
         runValidators: true,
       }
-    );
+    ).populate({
+      path: "createdBy",
+      select: "_id username email role",
+    });
 
     await session.commitTransaction();
     await session.endSession();
