@@ -50,7 +50,6 @@ const changePassword = async (
 ) => {
   // checking if the user is exist
   const user = await User.findById(userData._id);
-  // console.log({ user, userData, payload });
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User is not found !");
