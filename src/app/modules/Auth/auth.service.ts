@@ -60,18 +60,35 @@ const changePassword = async (
   if (!(await User.isPasswordMatched(payload.currentPassword, user?.password)))
     throw new AppError(httpStatus.FORBIDDEN, "Current password is incorrect");
 
-  // Check if the new password is unique and not among the last 2 used passwords
-  const recentPasswords = user?.passwordHistory || [];
-  if (
-    recentPasswords.some((entry) =>
-      User.isPasswordMatched(payload.newPassword, entry.password)
-    )
-  ) {
-    //   console.log("ami error");
+  // check the new password is not the current password
+  if (payload.newPassword === payload.currentPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Password change failed. Ensure the new password is unique and not among the last 2 used."
+      "New password should be different from the current password."
     );
+  }
+
+  // Retrieving the recent passwords from the user's history
+  const recentPasswords = user.passwordHistory || [];
+  for (const entry of recentPasswords.slice(-3)) {
+    const dateFormatOptions: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+    };
+    if (await User.isPasswordMatched(payload.newPassword, entry.password)) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Password change failed. Ensure the new password is unique and not among the last 3 used (last used on ${entry.timestamp.toLocaleString(
+          "en-US",
+          dateFormatOptions
+        )})`
+      );
+    }
   }
 
   //hash new password

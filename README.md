@@ -5,7 +5,7 @@
 Clone the project
 
 ```bash
-  git clone https://github.com/Porgramming-Hero-web-course/l2b2a3-course-review-nazmulhasannasim333
+  git clone https://github.com/Porgramming-Hero-web-course/l2b2a4-course-review-with-auth-nazmulhasannasim333
 ```
 
 Go to the project directory
