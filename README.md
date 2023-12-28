@@ -1,5 +1,13 @@
 # Project Instructions
 
+### Documentation: document API endpoints, request/response formats
+
+Documentation Link
+
+```http
+  https://documenter.getpostman.com/view/31247330/2s9YkuZy33
+```
+
 ### How to run the application locally
 
 Clone the project
@@ -43,7 +51,7 @@ Start the server
 -Create a Course
 
 ```http
-  http://localhost:5000/api/course
+  http://localhost:5000/api/courses
 ```
 
 -Get all Courses
