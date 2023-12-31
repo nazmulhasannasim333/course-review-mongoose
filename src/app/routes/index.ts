@@ -9,15 +9,15 @@ const router = express.Router();
 
 const moduleRoutes = [
   {
-    path: "/api/categories",
+    path: "",
     route: CategoryRoutes,
   },
   {
-    path: "/api",
+    path: "",
     route: CourseRoutes,
   },
   {
-    path: "/api/reviews",
+    path: "/reviews",
     route: ReviewRoutes,
   },
   {

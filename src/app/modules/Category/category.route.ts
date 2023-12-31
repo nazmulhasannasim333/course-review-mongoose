@@ -8,13 +8,13 @@ import { USER_ROLE } from "../User/user.constant";
 const router = express.Router();
 
 router.post(
-  "/",
+  "/categories",
   auth(USER_ROLE.admin),
   validateRequest(CategoryValidations.createCategoryValidationSchema),
   CategoryControllers.createCategory
 );
 router.get(
-  "/",
+  "/categories",
   auth(USER_ROLE.admin, USER_ROLE.user),
   CategoryControllers.getAllCategory
 );
